@@ -1,4 +1,3 @@
-// main.go
 package main
 
 import (
@@ -76,14 +75,14 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
         return
     }
 
-    // Preparar la consulta SQL
+    // Preparar la consulta SQL que primero elimina y luego inserta
     stmt, err := h.db.Prepare(`
+        WITH del AS (
+            DELETE FROM transactions 
+            WHERE id = $1
+        )
         INSERT INTO transactions (id, user_id, amount, datetime)
         VALUES ($1, $2, $3, $4)
-        ON CONFLICT (id) DO UPDATE SET
-            user_id = EXCLUDED.user_id,
-            amount = EXCLUDED.amount,
-            datetime = EXCLUDED.datetime
     `)
     if err != nil {
         c.JSON(500, gin.H{"error": "Database preparation error"})
@@ -119,16 +118,17 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
             continue
         }
 
-        // Insertar en la base de datos
+        // Primero eliminar si existe y luego insertar
         _, err = stmt.Exec(id, userID, amount, datetime)
         if err != nil {
-            log.Printf("Error inserting record: %v", err)
+            log.Printf("Error processing record: %v", err)
             continue
         }
     }
 
     c.JSON(200, gin.H{"message": "Migration completed successfully"})
 }
+
 
 // BalanceHandler maneja las operaciones de balance
 type BalanceHandler struct {
@@ -229,16 +229,23 @@ func initDB(config Config) (*sql.DB, error) {
         return nil, fmt.Errorf("error connecting to database: %w", err)
     }
 
+    // Primero eliminar la tabla existente si existe
+    _, err = db.Exec(`DROP TABLE IF EXISTS transactions;`)
+    if err != nil {
+        return nil, fmt.Errorf("error dropping table: %w", err)
+    }
+
+    // Crear la tabla exactamente como el CSV, sin constraints
     _, err = db.Exec(`
-        CREATE TABLE IF NOT EXISTS transactions (
-            id BIGINT PRIMARY KEY,
-            user_id BIGINT NOT NULL,
-            amount DECIMAL(10,2) NOT NULL,
-            datetime TIMESTAMP WITH TIME ZONE NOT NULL
+        CREATE TABLE transactions (
+            id BIGINT,
+            user_id BIGINT,
+            amount DECIMAL(10,2),
+            datetime TIMESTAMP WITH TIME ZONE
         );
         
-        CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
-        CREATE INDEX IF NOT EXISTS idx_transactions_datetime ON transactions(datetime);
+        CREATE INDEX idx_transactions_user_id ON transactions(user_id);
+        CREATE INDEX idx_transactions_datetime ON transactions(datetime);
     `)
     if err != nil {
         return nil, fmt.Errorf("error creating table: %w", err)

@@ -201,6 +201,9 @@ healthcheck:
 
 ### Container Management
 ```bash
+# remove volume
+docker volume rm go_challenge_postgres_data
+
 # Restart specific service
 docker-compose restart [service]
 
