@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/bulidaguzan/go_challenge/config"
+	"fintech-backend/config"
 )
 
 func InitDB(config config.Config) (*sql.DB, error) {

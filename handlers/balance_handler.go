@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"time"
 
+	"fintech-backend/models"
+
 	"github.com/gin-gonic/gin"
-	"github.com/bulidaguzan/go_challenge/models"
 )
 
 type BalanceHandler struct {

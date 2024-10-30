@@ -1,13 +1,13 @@
-// main.go
 package main
 
 import (
 	"log"
 
+	"fintech-backend/config"
+	"fintech-backend/db"
+	"fintech-backend/routes"
+
 	_ "github.com/lib/pq"
-	"github.com/yourusername/project/config"
-	"github.com/yourusername/project/db"
-	"github.com/yourusername/project/routes"
 )
 
 func main() {

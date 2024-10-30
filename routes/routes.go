@@ -3,7 +3,8 @@ package routes
 import (
 	"database/sql"
 
-	"github.com/bulidaguzan/go_challenge/handlers"
+	"fintech-backend/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 
