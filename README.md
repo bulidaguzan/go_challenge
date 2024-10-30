@@ -67,3 +67,14 @@ Status Codes:
 - 200: Success
 - 400: Invalid parameters
 - 500: Server error
+
+
+
+# Ver logs de todos los servicios
+docker-compose logs
+
+# Ver logs específicos de la aplicación
+docker-compose logs app
+
+# Ver logs específicos de la base de datos
+docker-compose logs db
