@@ -21,8 +21,8 @@ type BalanceHandler struct {
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Param from query string false "Start date (RFC3339)"
-// @Param to query string false "End date (RFC3339)"
+// @Param from query string false "Start date (RFC3339) 2024-07-05T00:00:00"
+// @Param to query string false "End date (RFC3339) 2024-07-05T00:00:00"
 // @Success 200 {object} models.BalanceResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
