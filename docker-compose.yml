@@ -5,10 +5,16 @@ services:
     build: .
     ports:
       - "8080:8080"
-    depends_on:
-      - db
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/fintech?sslmode=disable
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=fintech
+      - GIN_MODE=debug  
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - fintech-network
 
@@ -18,10 +24,27 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=fintech
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fintech-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
     networks:
       - fintech-network
 
@@ -31,3 +54,4 @@ volumes:
 networks:
   fintech-network:
     driver: bridge
+

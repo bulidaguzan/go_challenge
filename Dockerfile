@@ -1,13 +1,18 @@
-FROM golang:1.21-alpine
+FROM golang:1.22-alpine
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+# Instalar swag
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
+# Copiar archivos del proyecto
 COPY . .
 
-RUN go build -o main ./cmd/main.go
+# Generar documentación Swagger
+RUN swag init --parseDepth 1 --parseDependency --parseInternal
+# Descargar dependencias y compilar
+RUN go mod download
+RUN go build -o main .
 
 EXPOSE 8080
 
