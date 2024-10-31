@@ -11,6 +11,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=fintech
+      - GIN_MODE=debug  
     depends_on:
       db:
         condition: service_healthy
@@ -53,3 +54,4 @@ volumes:
 networks:
   fintech-network:
     driver: bridge
+

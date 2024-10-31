@@ -1,13 +1,17 @@
-FROM golang:1.21-alpine
+FROM golang:1.22-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache git postgresql-client
+# Instalar swag
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
+# Copiar archivos del proyecto
 COPY . .
 
+# Generar documentación Swagger
+RUN swag init --parseDepth 1 --parseDependency --parseInternal
+# Descargar dependencias y compilar
 RUN go mod download
-
 RUN go build -o main .
 
 EXPOSE 8080

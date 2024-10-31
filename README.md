@@ -44,6 +44,10 @@ docker-compose up -d
 # View logs
 docker-compose logs -f
 ```
+# Access Swagger UI:
+- Navigate to `http://localhost:8080/swagger/index.html`
+- Test endpoints directly from the interface
+
 
 ### Service Architecture
 ```yml
@@ -165,15 +169,7 @@ docker-compose logs pgadmin
 docker-compose logs -f [service]
 ```
 
-### Health Checks
-The PostgreSQL service includes built-in health checks:
-```yaml
-healthcheck:
-  test: ["CMD-SHELL", "pg_isready -U postgres"]
-  interval: 5s
-  timeout: 5s
-  retries: 5
-```
+
 
 ## 🔧 Troubleshooting
 
@@ -219,3 +215,6 @@ docker-compose down -v
 2. Create your feature branch: `git checkout -b feature/amazing-feature`
 3. Implement tests for new features
 4. Submit a Pull Request
+
+
+

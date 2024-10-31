@@ -1,9 +1,14 @@
 // handlers/migration_handler.go
 package handlers
 
+// MigrationHandler represents the migration handler
+// @title Migration Handler
+// @description Handler for migrating CSV data
+
 import (
 	"database/sql"
 	"encoding/csv"
+	"fintech-backend/models"
 	"log"
 	"strconv"
 	"time"
@@ -15,6 +20,18 @@ type MigrationHandler struct {
     db *sql.DB
 }
 
+
+// MigrateCSV godoc
+// @Summary      Migrate CSV data
+// @Description  Upload and process a CSV file containing transaction records
+// @Tags         migration
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file formData file true "CSV file to upload"
+// @Success      200  {object}  models.SuccessResponse
+// @Failure      400  {object}  models.ErrorResponse
+// @Failure      500  {object}  models.ErrorResponse
+// @Router       /migrate [post]
 func NewMigrationHandler(db *sql.DB) *MigrationHandler {
     return &MigrationHandler{db: db}
 }
@@ -28,7 +45,7 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
 
     openedFile, err := file.Open()
     if err != nil {
-        c.JSON(500, gin.H{"error": "Error opening file"})
+        c.JSON(500, models.ErrorResponse{Error: "Error opening file"})
         return
     }
     defer openedFile.Close()
@@ -37,7 +54,7 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
 
     _, err = reader.Read()
     if err != nil {
-        c.JSON(400, gin.H{"error": "Error reading CSV header"})
+        c.JSON(400, models.ErrorResponse{Error: "Error reading CSV header"})
         return
     }
 
@@ -50,7 +67,7 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
         VALUES ($1, $2, $3, $4)
     `)
     if err != nil {
-        c.JSON(500, gin.H{"error": "Database preparation error"})
+        c.JSON(500, models.ErrorResponse{Error: "Database preparation error"})
         return
     }
     defer stmt.Close()
@@ -88,5 +105,5 @@ func (h *MigrationHandler) MigrateCSV(c *gin.Context) {
         }
     }
 
-    c.JSON(200, gin.H{"message": "Migration completed successfully"})
+    c.JSON(200, models.SuccessResponse{Message: "Migration completed successfully"})
 }

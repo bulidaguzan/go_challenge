@@ -1,13 +1,11 @@
-// handlers/balance_handler.go
 package handlers
 
 import (
 	"database/sql"
+	"fintech-backend/models"
 	"fmt"
 	"strconv"
 	"time"
-
-	"fintech-backend/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +14,19 @@ type BalanceHandler struct {
     db *sql.DB
 }
 
+// GetBalance godoc
+// @Summary Get user balance
+// @Description Get the balance and transaction counts for a specific user
+// @Tags balance
+// @Accept json
+// @Produce json
+// @Param user_id path int true "User ID"
+// @Param from query string false "Start date (RFC3339)"
+// @Param to query string false "End date (RFC3339)"
+// @Success 200 {object} models.BalanceResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/balance [get]
 func NewBalanceHandler(db *sql.DB) *BalanceHandler {
     return &BalanceHandler{db: db}
 }
@@ -23,7 +34,7 @@ func NewBalanceHandler(db *sql.DB) *BalanceHandler {
 func (h *BalanceHandler) GetBalance(c *gin.Context) {
     userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
     if err != nil {
-        c.JSON(400, gin.H{"error": "Invalid user ID"})
+        c.JSON(400, models.ErrorResponse{Error: "Invalid user ID"})
         return
     }
 
@@ -44,13 +55,13 @@ func (h *BalanceHandler) GetBalance(c *gin.Context) {
     if fromStr != "" && toStr != "" {
         from, err := time.Parse(time.RFC3339, fromStr)
         if err != nil {
-            c.JSON(400, gin.H{"error": "Invalid from date format"})
+            c.JSON(400, models.ErrorResponse{Error: "Invalid from date format"})
             return
         }
 
         to, err := time.Parse(time.RFC3339, toStr)
         if err != nil {
-            c.JSON(400, gin.H{"error": "Invalid to date format"})
+            c.JSON(400, models.ErrorResponse{Error: "Invalid to date format"})
             return
         }
 
@@ -61,7 +72,7 @@ func (h *BalanceHandler) GetBalance(c *gin.Context) {
     var response models.BalanceResponse
     err = h.db.QueryRow(query, args...).Scan(&response.Balance, &response.TotalDebits, &response.TotalCredits)
     if err != nil {
-        c.JSON(500, gin.H{"error": "Database query error"})
+        c.JSON(500, models.ErrorResponse{Error: "Database query error"})
         return
     }
 
